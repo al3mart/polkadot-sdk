@@ -502,7 +502,7 @@ pub mod pallet {
 			// like for example from scheduler, we only kill the storage entry if it was not yet
 			// updated in the current block.
 			if !<DidSetValidationCode<T>>::get() {
-				// NOTE: Killing here is required to at least include the trie nodes down to the key
+				// NOTE: Killing here is required to at least include the trie nodes down to the keyLasT
 				// in the proof. Because this value will be read in `validate_block` and thus,
 				// needs to be reachable by the proof.
 				NewValidationCode::<T>::kill();
@@ -1291,10 +1291,13 @@ impl<T: Config> Pallet<T> {
 		let mut mqc_heads = <LastHrmpMqcHeads<T>>::get();
 
 		let default_message = MessageQueueChain::default();
+		let last_relay_blocknumber: RelayChainBlockNumber = 8737814;
 
 		if messages.is_empty() {
-			mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
-			mqc_heads.entry(ParaId::from(1111)).or_insert(default_message.clone());
+			if LastRelayChainBlockNumber::<T>::get() == last_relay_blocknumber {
+				mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
+				mqc_heads.entry(ParaId::from(1111)).or_insert(default_message.clone());
+			}
 			Self::check_hrmp_mcq_heads(ingress_channels, &mut mqc_heads);
 			let last_processed_msg =
 				InboundMessageId { sent_at: relay_parent_number, reverse_idx: 0 };
@@ -1319,8 +1322,11 @@ impl<T: Config> Pallet<T> {
 			}
 			last_processed_msg.sent_at = msg.sent_at;
 		}
-		mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
-		mqc_heads.entry(ParaId::from(1111)).or_insert(default_message);
+
+		if LastRelayChainBlockNumber::<T>::get() == last_relay_blocknumber {
+			mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
+			mqc_heads.entry(ParaId::from(1111)).or_insert(default_message.clone());
+		}
 		<LastHrmpMqcHeads<T>>::put(&mqc_heads);
 		for (sender, msg) in hashed_messages {
 			Self::check_hrmp_message_metadata(
