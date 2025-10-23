@@ -1296,7 +1296,6 @@ impl<T: Config> Pallet<T> {
 		if messages.is_empty() {
 			if LastRelayChainBlockNumber::<T>::get() == last_relay_blocknumber {
 				mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
-				mqc_heads.entry(ParaId::from(1111)).or_insert(default_message.clone());
 			}
 			Self::check_hrmp_mcq_heads(ingress_channels, &mut mqc_heads);
 			let last_processed_msg =
@@ -1325,7 +1324,6 @@ impl<T: Config> Pallet<T> {
 
 		if LastRelayChainBlockNumber::<T>::get() == last_relay_blocknumber {
 			mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
-			mqc_heads.entry(ParaId::from(1111)).or_insert(default_message.clone());
 		}
 		<LastHrmpMqcHeads<T>>::put(&mqc_heads);
 		for (sender, msg) in hashed_messages {
