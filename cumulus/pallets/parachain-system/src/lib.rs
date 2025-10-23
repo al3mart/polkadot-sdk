@@ -1290,7 +1290,11 @@ impl<T: Config> Pallet<T> {
 		let (messages, hashed_messages) = horizontal_messages.messages();
 		let mut mqc_heads = <LastHrmpMqcHeads<T>>::get();
 
+		let default_message = MessageQueueChain::default();
+
 		if messages.is_empty() {
+			mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
+			mqc_heads.entry(ParaId::from(1111)).or_insert(default_message.clone());
 			Self::check_hrmp_mcq_heads(ingress_channels, &mut mqc_heads);
 			let last_processed_msg =
 				InboundMessageId { sent_at: relay_parent_number, reverse_idx: 0 };
@@ -1315,6 +1319,8 @@ impl<T: Config> Pallet<T> {
 			}
 			last_processed_msg.sent_at = msg.sent_at;
 		}
+		mqc_heads.entry(ParaId::from(2034)).or_insert(default_message.clone());
+		mqc_heads.entry(ParaId::from(1111)).or_insert(default_message);
 		<LastHrmpMqcHeads<T>>::put(&mqc_heads);
 		for (sender, msg) in hashed_messages {
 			Self::check_hrmp_message_metadata(
