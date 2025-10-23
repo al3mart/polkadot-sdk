@@ -502,7 +502,7 @@ pub mod pallet {
 			// like for example from scheduler, we only kill the storage entry if it was not yet
 			// updated in the current block.
 			if !<DidSetValidationCode<T>>::get() {
-				// NOTE: Killing here is required to at least include the trie nodes down to the keyLasT
+				// NOTE: Killing here is required to at least include the trie nodes down to the key
 				// in the proof. Because this value will be read in `validate_block` and thus,
 				// needs to be reachable by the proof.
 				NewValidationCode::<T>::kill();
